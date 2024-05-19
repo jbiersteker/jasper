@@ -6,7 +6,7 @@ let isSudo = false;
 
 // Function to initialize the file system from GitHub
 async function initializeFileSystem() {
-    const response = await fetch('https://raw.githubusercontent.com/yourusername/terminal-file-system/main/file-system.json');
+    const response = await fetch('https://raw.githubusercontent.com/jhbiersteker/site/main/site_files/home/guest/file-system.json');
     if (response.ok) {
         fileSystem = await response.json();
         console.log('File system initialized:', fileSystem);
