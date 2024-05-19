@@ -1,39 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Line Interface</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="background">
-        <pre class="line-numbers"><code class="language-java" id="code"></code></pre>
+  <div id="terminal">
+    <div id="output"></div>
+    <div id="input-line">
+      <span id="prompt">$</span>
+      <span id="user-input"></span>
+      <input type="text" id="hidden-input" autofocus>
     </div>
-    <header class="header">
-        <h1>My Portfolio</h1>
-        <p>Gamer | Programmer</p>
-    </header>
-    <section class="projects">
-        <div class="project">
-            <img src="path_to_your_image.jpg" alt="Project Image">
-            <div class="project-content">
-                <h3>Project Title</h3>
-                <p>Project description goes here...</p>
-            </div>
-        </div>
-        <!-- Add more project divs as needed -->
-    </section>
-    <footer class="social-media">
-        <a href="https://twitter.com/yourprofile" target="_blank">Twitter</a>
-        <a href="https://github.com/yourprofile" target="_blank">GitHub</a>
-        <a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a>
-    </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-java.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
-    <script src="script.js"></script>
+  </div>
+  <script src="scripts.js"></script>
 </body>
 </html>
