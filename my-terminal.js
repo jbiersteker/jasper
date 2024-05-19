@@ -429,7 +429,8 @@ function showProgressBar(term, callback) {
 function showCookiePrompt(term, callback) {
     term.echo('Do you accept cookies? [Y/n]');
     term.push(function(response) {
-        if (response.toLowerCase() === 'y' || response.toLowerCase() === 'n') {
+        response = response.toLowerCase();
+        if (response === 'y' || response === 'yes' || response === 'n' || response === 'no') {
             callback();
             term.pop();
         } else {
