@@ -1,7 +1,9 @@
+// /js/commands.js
+
 const commandDefinitions = {
     "help": {
         "description": "List available commands.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             const command_list = Object.keys(commandDefinitions).map(cmd => `<white class="command">${cmd}</white>`);
             const help = command_list.join(', ');
             term.echo(`List of available commands: ${help}`);
@@ -9,13 +11,13 @@ const commandDefinitions = {
     },
     "echo": {
         "description": "Echo the input arguments.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             term.echo(args.join(' '));
         }
     },
     "cd": {
         "description": "Change directory.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             const dir = args[0];
             if (!dir || dir === '~') {
                 cwd = ['home', 'guest'];
@@ -36,25 +38,25 @@ const commandDefinitions = {
     },
     "ls": {
         "description": "List contents of the current directory.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             term.echo(listDir(getCurrentDir()));
         }
     },
     "touch": {
         "description": "Create an empty file.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             term.echo(addFile(args[0]));
         }
     },
     "mkdir": {
         "description": "Create a directory.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             term.echo(addDir(args[0]));
         }
     },
     "rm": {
         "description": "Remove a file or directory.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             const path = args[0];
             if (path.endsWith('/')) {
                 term.echo(removeDir(path.slice(0, -1)));
@@ -65,7 +67,7 @@ const commandDefinitions = {
     },
     "mv": {
         "description": "Move a file or directory.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             const [src, dest] = args;
             if (src.endsWith('/')) {
                 term.echo(moveDir(src.slice(0, -1), dest));
@@ -76,7 +78,7 @@ const commandDefinitions = {
     },
     "cp": {
         "description": "Copy a file or directory.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             const [src, dest] = args;
             if (src.endsWith('/')) {
                 term.echo(duplicateDir(src.slice(0, -1), dest));
@@ -87,20 +89,20 @@ const commandDefinitions = {
     },
     "cat": {
         "description": "Display the contents of a file.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             term.echo(readFile(args[0]));
         }
     },
     "write": {
         "description": "Write content to a file.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             const [path, ...content] = args;
             term.echo(writeFile(path, content.join(' ')));
         }
     },
     "sudo": {
         "description": "Execute a command as superuser.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             isSudo = true;
             const command = args.join(' ');
             term.echo(`Executing with elevated privileges: ${command}`);
@@ -111,7 +113,7 @@ const commandDefinitions = {
     },
     "theme": {
         "description": "Switch the terminal theme.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             const theme = args[0];
             if (fileSystem.home.guest.themes[theme]) {
                 term.echo(applyTheme(theme));
@@ -122,7 +124,7 @@ const commandDefinitions = {
     },
     "credits": {
         "description": "Show the list of libraries used.",
-        "execute": function(term, args) {
+        "execute": function(args) {
             term.echo([
                 '',
                 '<white>Used libraries:</white>',
