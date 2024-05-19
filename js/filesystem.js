@@ -1,40 +1,19 @@
 // /js/filesystem.js
 
-const fileSystem = {
-    home: {
-        guest: {
-            code: {
-                python: {},
-                'c#': {},
-                c: {},
-                'c++': {},
-                java: {},
-                other: {}
-            },
-            resources: {
-                unity: {},
-                python: {}
-            },
-            projects: {
-                unity: {},
-                python: {},
-                'c#': {},
-                c: {},
-                'c++': {},
-                java: {},
-                other: {}
-            },
-            themes: {
-                light: {},
-                dark: {},
-                retro: {}
-            }
-        }
-    }
-};
-
+let fileSystem = {};
 let cwd = ['home', 'guest'];
 let isSudo = false;
+
+// Function to initialize the file system from GitHub
+async function initializeFileSystem() {
+    const response = await fetch('https://raw.githubusercontent.com/yourusername/terminal-file-system/main/file-system.json');
+    if (response.ok) {
+        fileSystem = await response.json();
+        console.log('File system initialized:', fileSystem);
+    } else {
+        console.error('Failed to initialize file system');
+    }
+}
 
 function getCurrentDir() {
     return cwd.reduce((dir, subDir) => dir[subDir], fileSystem);
