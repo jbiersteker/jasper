@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Command Line Interface</title>
-  <link rel="stylesheet" href="style.css">
+    <link id="theme-link" rel="stylesheet" href="themes/default.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"/>
+    <style>
+        .command, .directory {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <div id="terminal">
-    <div id="output"></div>
-    <div id="input-line">
-      <span id="prompt">$</span>
-      <span id="user-input"></span>
-      <input type="text" id="hidden-input" autofocus>
-    </div>
-  </div>
-  <script src="scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/xml_formatting.js"></script>
+    <script src="my-terminal.js"></script>
 </body>
 </html>
