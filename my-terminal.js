@@ -33,6 +33,7 @@ const fileSystem = {
 
 let cwd = ['home', 'guest'];
 let isSudo = false;
+let commandHistory = [];
 
 function getCurrentDir() {
     return cwd.reduce((dir, subDir) => dir[subDir], fileSystem);
@@ -217,7 +218,8 @@ function executeCommand(command, args) {
 function startTerminal() {
     const term = $('body').terminal((command, term) => {
         const [cmd, ...args] = command.split(' ');
-        executeCommand(cmd, args);
+        executeCommand(cmd.toLowerCase(), args);
+        commandHistory.push(command);
     }, {
         greetings: "Welcome to my Terminal Portfolio",
         checkArity: false,
@@ -226,7 +228,7 @@ function startTerminal() {
             const cmd = this.get_command();
             const { name, rest } = $.terminal.parse_command(cmd);
             const currentDir = getCurrentDir();
-            if (['cd', 'ls'].includes(name)) {
+            if (['cd', 'ls'].includes(name.toLowerCase())) {
                 if (typeof currentDir === 'object') {
                     return Object.keys(currentDir);
                 }
@@ -248,4 +250,20 @@ function startTerminal() {
 
     $.terminal.xml_formatter.tags.green = (attrs) => `[[;#44D544;]`;
     $.terminal.xml_formatter.tags.blue = (attrs) => `[[;#55F;;${attrs.class}]`;
+
+    // Session persistence
+    if (localStorage.getItem('cwd')) {
+        cwd = JSON.parse(localStorage.getItem('cwd'));
+    }
+    if (localStorage.getItem('commandHistory')) {
+        commandHistory = JSON.parse(localStorage.getItem('commandHistory'));
+    }
+
+    term.history().clear();
+    commandHistory.forEach(cmd => term.history().append(cmd));
+
+    $(window).on('beforeunload', function() {
+        localStorage.setItem('cwd', JSON.stringify(cwd));
+        localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
+    });
 }
