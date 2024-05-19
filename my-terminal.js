@@ -349,37 +349,96 @@ function executeCommand(command, args) {
     }
 }
 
-// Terminal Initialization
-const term = $('body').terminal((command, term) => {
-    const [cmd, ...args] = command.split(' ');
-    executeCommand(cmd, args);
-}, {
-    greetings: "Welcome to my Terminal Portfolio",
-    checkArity: false,
-    exit: false,
-    completion(string) {
-        const cmd = this.get_command();
-        const { name, rest } = $.terminal.parse_command(cmd);
-        const currentDir = getCurrentDir();
-        if (['cd', 'ls'].includes(name)) {
-            if (typeof currentDir === 'object') {
-                return Object.keys(currentDir);
+function startTerminal() {
+    const term = $('body').terminal((command, term) => {
+        const [cmd, ...args] = command.split(' ');
+        executeCommand(cmd, args);
+    }, {
+        greetings: "Welcome to my Terminal Portfolio",
+        checkArity: false,
+        exit: false,
+        completion(string) {
+            const cmd = this.get_command();
+            const { name, rest } = $.terminal.parse_command(cmd);
+            const currentDir = getCurrentDir();
+            if (['cd', 'ls'].includes(name)) {
+                if (typeof currentDir === 'object') {
+                    return Object.keys(currentDir);
+                }
             }
+            return Object.keys(commandDefinitions);
+        },
+        prompt
+    });
+
+    term.on('click', '.command', function() {
+        const command = $(this).text();
+        term.exec(command);
+    });
+
+    term.on('click', '.directory', function() {
+        const dir = $(this).text();
+        term.exec(`cd ${dir}`);
+    });
+
+    $.terminal.xml_formatter.tags.green = (attrs) => `[[;#44D544;]`;
+    $.terminal.xml_formatter.tags.blue = (attrs) => `[[;#55F;;${attrs.class}]`;
+}
+
+function showLoadingAnimation(term, callback) {
+    const logs = [
+        'Loading system files',
+        'Initializing modules',
+        'Connecting to the server',
+        'Fetching user data'
+    ];
+    let index = 0;
+
+    function log() {
+        if (index < logs.length) {
+            term.echo(`${logs[index]}...`);
+            index++;
+            setTimeout(log, 1000);
+        } else {
+            showProgressBar(term, callback);
         }
-        return Object.keys(commandDefinitions);
-    },
-    prompt
-});
+    }
 
-term.on('click', '.command', function() {
-    const command = $(this).text();
-    term.exec(command);
-});
+    log();
+}
 
-term.on('click', '.directory', function() {
-    const dir = $(this).text();
-    term.exec(`cd ${dir}`);
-});
+function showProgressBar(term, callback) {
+    const progressBarLength = 20;
+    let progress = 0;
 
-$.terminal.xml_formatter.tags.green = (attrs) => `[[;#44D544;]`;
-$.terminal.xml_formatter.tags.blue = (attrs) => `[[;#55F;;${attrs.class}]`;
+    function updateProgressBar() {
+        const bar = '[' + '='.repeat(progress) + ' '.repeat(progressBarLength - progress) + ']';
+        term.update(-1, `Loading: ${bar} ${progress * 5}%`);
+        if (progress < progressBarLength) {
+            progress++;
+            setTimeout(updateProgressBar, 200);
+        } else {
+            showCookiePrompt(term, callback);
+        }
+    }
+
+    term.echo('Loading: [                    ] 0%');
+    updateProgressBar();
+}
+
+function showCookiePrompt(term, callback) {
+    term.echo('Do you accept cookies? [Y/n]');
+    term.push(function(response) {
+        if (response.toLowerCase() === 'y' || response.toLowerCase() === 'n') {
+            callback();
+            term.pop();
+        } else {
+            term.echo('Please enter Y or n.');
+        }
+    });
+}
+
+$(document).ready(function() {
+    const term = $('body').terminal();
+    showLoadingAnimation(term, startTerminal);
+});
