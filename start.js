@@ -44,8 +44,8 @@ function showCookiePrompt(term, callback) {
     term.push(function(response) {
         response = response.toLowerCase();
         if (response === 'y' || response === 'yes' || response === 'n' || response === 'no') {
-            callback();
             term.pop();
+            callback();
         } else {
             term.echo('Please enter Y or n.');
         }
