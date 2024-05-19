@@ -54,3 +54,10 @@ term.on('click', '.directory', function() {
 
 $.terminal.xml_formatter.tags.green = (attrs) => `[[;#44D544;]`;
 $.terminal.xml_formatter.tags.blue = (attrs) => `[[;#55F;;${attrs.class}]`;
+
+// Initialize the file system from GitHub
+initializeFileSystem().then(() => {
+    term.echo('File system initialized.');
+}).catch(error => {
+    console.error('Error initializing file system:', error);
+});
