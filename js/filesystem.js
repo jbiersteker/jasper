@@ -1,58 +1,57 @@
-function showLoadingAnimation(term, callback) {
-    const logs = [
-        'Loading system files',
-        'Initializing modules',
-        'Connecting to the server',
-        'Fetching user data'
-    ];
-    let index = 0;
+// /js/filesystem.js
 
-    function log() {
-        if (index < logs.length) {
-            term.echo(`${logs[index]}...`);
-            index++;
-            setTimeout(log, 1000);
-        } else {
-            showProgressBar(term, callback);
+const fileSystem = {
+    home: {
+        guest: {
+            code: {
+                python: {},
+                'c#': {},
+                c: {},
+                'c++': {},
+                java: {},
+                other: {}
+            },
+            resources: {
+                unity: {},
+                python: {}
+            },
+            projects: {
+                unity: {},
+                python: {},
+                'c#': {},
+                c: {},
+                'c++': {},
+                java: {},
+                other: {}
+            },
+            themes: {
+                light: {},
+                dark: {},
+                retro: {}
+            }
         }
     }
+};
 
-    log();
+let cwd = ['home', 'guest'];
+let isSudo = false;
+
+function getCurrentDir() {
+    return cwd.reduce((dir, subDir) => dir[subDir], fileSystem);
 }
 
-function showProgressBar(term, callback) {
-    const progressBarLength = 20;
-    let progress = 0;
-
-    function updateProgressBar() {
-        const bar = '[' + '='.repeat(progress) + ' '.repeat(progressBarLength - progress) + ']';
-        term.update(-1, `Loading: ${bar} ${progress * 5}%`);
-        if (progress < progressBarLength) {
-            progress++;
-            setTimeout(updateProgressBar, 200);
-        } else {
-            showCookiePrompt(term, callback);
-        }
+function listDir(dir) {
+    if (typeof dir === 'object') {
+        return Object.keys(dir).map(subDir => `<blue class="directory">${subDir}</blue>`).join('\n');
+    } else {
+        return '';
     }
-
-    term.echo('Loading: [                    ] 0%');
-    updateProgressBar();
 }
 
-function showCookiePrompt(term, callback) {
-    term.echo('Do you accept cookies? [Y/n]');
-    term.push(function(response) {
-        response = response.toLowerCase();
-        if (['y', 'yes', 'n', 'no'].includes(response)) {
-            term.pop();
-            callback();
-        } else {
-            term.echo('Please enter Y or n.');
-        }
-    });
+function getPathParts(path) {
+    return path.split(/[\\/]/).filter(part => part.length > 0);
 }
 
-$(document).ready(function() {
-    const term = $('body').terminal();
-    showLoadingAnimation(term, startTerminal);
-});
+function getDir(pathParts, root = fileSystem) {
+    return pathParts.reduce((dir, part) => dir && dir[part], root);
+}
