@@ -1,51 +1,48 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const prompt = document.getElementById('prompt');
-  const userInput = document.getElementById('user-input');
-  const hiddenInput = document.getElementById('hidden-input');
-  const output = document.getElementById('output');
+body {
+  background-color: black;
+  color: green;
+  font-family: monospace;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
 
-  const commands = {
-    "help": {
-      description: "Lists all available commands",
-      action: function() {
-        const commandList = Object.keys(commands).join(', ');
-        displayOutput(`Available commands: ${commandList}`);
-      }
-    },
-    "greet": {
-      description: "Greets the user",
-      action: function() {
-        displayOutput("Hello, user!");
-      }
-    }
-  };
+#terminal {
+  width: 80%;
+  margin-top: 20px;
+}
 
-  hiddenInput.addEventListener('input', (e) => {
-    userInput.textContent = hiddenInput.value;
-  });
+#output {
+  white-space: pre-wrap;
+}
 
-  hiddenInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      const input = hiddenInput.value.trim();
-      const command = commands[input];
-      
-      displayOutput(`$ ${input}`);
+#input-line {
+  display: flex;
+}
 
-      if (command) {
-        command.action();
-      } else {
-        displayOutput(`An error occurred: command not found. Type 'help' for a list of all commands.`);
-      }
+#hidden-input {
+  background: none;
+  border: none;
+  color: green;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  caret-color: green;
+  width: 100%;
+}
 
-      hiddenInput.value = '';
-      userInput.textContent = '';
-      event.preventDefault();  // Prevent form submission
-    }
-  });
+.blinking-cursor {
+  display: inline-block;
+  width: 10px;
+  background-color: green;
+  animation: blink 1s infinite;
+}
 
-  function displayOutput(text) {
-    const newOutput = document.createElement('div');
-    newOutput.textContent = text;
-    output.appendChild(newOutput);
-  }
-});
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
