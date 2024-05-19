@@ -267,3 +267,5 @@ function startTerminal() {
         localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
     });
 }
+
+$(document).ready(startTerminal);
