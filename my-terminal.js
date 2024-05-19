@@ -203,10 +203,10 @@ function prompt() {
 
 function executeCommand(command, args) {
     if (args.includes('--help')) {
-        term.echo(commandDefinitions[command].description);
+        commandDefinitions[command].description;
     } else if (commandDefinitions[command]) {
         if (isSudo || !['rm', 'mv', 'cp', 'write'].includes(command)) {
-            commandDefinitions[command].execute(args);
+            commandDefinitions[command].execute(term, args);
         } else {
             term.error(`Permission denied: ${command}`);
         }
