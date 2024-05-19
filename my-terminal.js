@@ -32,6 +32,7 @@ const fileSystem = {
 };
 
 let cwd = ['home', 'guest'];
+let isSudo = false;
 
 function getCurrentDir() {
     return cwd.reduce((dir, subDir) => dir[subDir], fileSystem);
@@ -64,6 +65,17 @@ function addDir(path) {
     return `Directory ${dirName} created.`;
 }
 
+function addFile(path) {
+    const pathParts = getPathParts(path);
+    const fileName = pathParts.pop();
+    const parentDir = getDir(pathParts);
+    if (parentDir[fileName]) {
+        return `File ${fileName} already exists.`;
+    }
+    parentDir[fileName] = '';
+    return `File ${fileName} created.`;
+}
+
 function removeDir(path) {
     const pathParts = getPathParts(path);
     const dirName = pathParts.pop();
@@ -76,6 +88,17 @@ function removeDir(path) {
     }
     delete parentDir[dirName];
     return `Directory ${dirName} removed.`;
+}
+
+function removeFile(path) {
+    const pathParts = getPathParts(path);
+    const fileName = pathParts.pop();
+    const parentDir = getDir(pathParts);
+    if (!parentDir || !parentDir[fileName]) {
+        return `File ${fileName} does not exist.`;
+    }
+    delete parentDir[fileName];
+    return `File ${fileName} removed.`;
 }
 
 function moveDir(src, dest) {
@@ -95,6 +118,23 @@ function moveDir(src, dest) {
     return `Directory ${dirName} moved to ${dest}.`;
 }
 
+function moveFile(src, dest) {
+    const srcParts = getPathParts(src);
+    const destParts = getPathParts(dest);
+    const fileName = srcParts.pop();
+    const srcParentDir = getDir(srcParts);
+    const destParentDir = getDir(destParts);
+    if (!srcParentDir || !srcParentDir[fileName]) {
+        return `File ${fileName} does not exist.`;
+    }
+    if (destParentDir[fileName]) {
+        return `File ${fileName} already exists in the destination.`;
+    }
+    destParentDir[fileName] = srcParentDir[fileName];
+    delete srcParentDir[fileName];
+    return `File ${fileName} moved to ${dest}.`;
+}
+
 function duplicateDir(src, dest) {
     const srcParts = getPathParts(src);
     const destParts = getPathParts(dest);
@@ -109,6 +149,43 @@ function duplicateDir(src, dest) {
     }
     destParentDir[dirName] = JSON.parse(JSON.stringify(srcParentDir[dirName]));
     return `Directory ${dirName} duplicated to ${dest}.`;
+}
+
+function duplicateFile(src, dest) {
+    const srcParts = getPathParts(src);
+    const destParts = getPathParts(dest);
+    const fileName = srcParts.pop();
+    const srcParentDir = getDir(srcParts);
+    const destParentDir = getDir(destParts);
+    if (!srcParentDir || !srcParentDir[fileName]) {
+        return `File ${fileName} does not exist.`;
+    }
+    if (destParentDir[fileName]) {
+        return `File ${fileName} already exists in the destination.`;
+    }
+    destParentDir[fileName] = srcParentDir[fileName];
+    return `File ${fileName} duplicated to ${dest}.`;
+}
+
+function readFile(path) {
+    const pathParts = getPathParts(path);
+    const fileName = pathParts.pop();
+    const parentDir = getDir(pathParts);
+    if (!parentDir || !parentDir[fileName]) {
+        return `File ${fileName} does not exist.`;
+    }
+    return parentDir[fileName];
+}
+
+function writeFile(path, content) {
+    const pathParts = getPathParts(path);
+    const fileName = pathParts.pop();
+    const parentDir = getDir(pathParts);
+    if (!parentDir || !parentDir[fileName]) {
+        return `File ${fileName} does not exist.`;
+    }
+    parentDir[fileName] = content;
+    return `File ${fileName} written.`;
 }
 
 function applyTheme(theme) {
@@ -159,37 +236,73 @@ const commandDefinitions = {
             term.echo(listDir(getCurrentDir()));
         }
     },
-    "credits": {
-        "description": "Show the list of libraries used.",
+    "touch": {
+        "description": "Create an empty file.",
         "execute": function(args) {
-            term.echo([
-                '',
-                '<white>Used libraries:</white>',
-                '* <a href="https://terminal.jcubic.pl">jQuery Terminal</a>',
-                ''
-            ].join('\n'));
+            term.echo(addFile(args[0]));
+        }
+    },
+    "mkdir": {
+        "description": "Create a directory.",
+        "execute": function(args) {
+            term.echo(addDir(args[0]));
+        }
+    },
+    "rm": {
+        "description": "Remove a file or directory.",
+        "execute": function(args) {
+            const path = args[0];
+            if (path.endsWith('/')) {
+                term.echo(removeDir(path.slice(0, -1)));
+            } else {
+                term.echo(removeFile(path));
+            }
+        }
+    },
+    "mv": {
+        "description": "Move a file or directory.",
+        "execute": function(args) {
+            const [src, dest] = args;
+            if (src.endsWith('/')) {
+                term.echo(moveDir(src.slice(0, -1), dest));
+            } else {
+                term.echo(moveFile(src, dest));
+            }
+        }
+    },
+    "cp": {
+        "description": "Copy a file or directory.",
+        "execute": function(args) {
+            const [src, dest] = args;
+            if (src.endsWith('/')) {
+                term.echo(duplicateDir(src.slice(0, -1), dest));
+            } else {
+                term.echo(duplicateFile(src, dest));
+            }
+        }
+    },
+    "cat": {
+        "description": "Display the contents of a file.",
+        "execute": function(args) {
+            term.echo(readFile(args[0]));
+        }
+    },
+    "write": {
+        "description": "Write content to a file.",
+        "execute": function(args) {
+            const [path, ...content] = args;
+            term.echo(writeFile(path, content.join(' ')));
         }
     },
     "sudo": {
         "description": "Execute a command as superuser.",
         "execute": function(args) {
-            const [subCommand, ...subArgs] = args;
-            switch (subCommand) {
-                case 'mkdir':
-                    term.echo(addDir(subArgs[0]));
-                    break;
-                case 'rmdir':
-                    term.echo(removeDir(subArgs[0]));
-                    break;
-                case 'mv':
-                    term.echo(moveDir(subArgs[0], subArgs[1]));
-                    break;
-                case 'cp':
-                    term.echo(duplicateDir(subArgs[0], subArgs[1]));
-                    break;
-                default:
-                    term.error('Invalid sudo command.');
-            }
+            isSudo = true;
+            const command = args.join(' ');
+            term.echo(`Executing with elevated privileges: ${command}`);
+            term.exec(command, false, () => {
+                isSudo = false;
+            });
         }
     },
     "theme": {
@@ -201,6 +314,17 @@ const commandDefinitions = {
             } else {
                 term.error('Theme not found.');
             }
+        }
+    },
+    "credits": {
+        "description": "Show the list of libraries used.",
+        "execute": function(args) {
+            term.echo([
+                '',
+                '<white>Used libraries:</white>',
+                '* <a href="https://terminal.jcubic.pl">jQuery Terminal</a>',
+                ''
+            ].join('\n'));
         }
     }
 };
@@ -215,7 +339,11 @@ function executeCommand(command, args) {
     if (args.includes('--help')) {
         term.echo(commandDefinitions[command].description);
     } else if (commandDefinitions[command]) {
-        commandDefinitions[command].execute(args);
+        if (isSudo || !['rm', 'mv', 'cp', 'write'].includes(command)) {
+            commandDefinitions[command].execute(args);
+        } else {
+            term.error(`Permission denied: ${command}`);
+        }
     } else {
         term.error(`Command "${command}" not found.`);
     }
